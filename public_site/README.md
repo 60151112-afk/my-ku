@@ -47,6 +47,28 @@ streamlit run public_site/app.py --server.address 0.0.0.0 --server.port 8503
 
 公开网页仅用于研究展示，不构成投资建议。
 
+## 一键更新公网版本
+
+仓库绑定 GitHub 后，日常更新公网网页优先使用：
+
+```powershell
+scripts\update_public_dashboard_and_push.ps1
+```
+
+该脚本会执行：
+
+- 生成脱敏公开快照；
+- 校验公开目录没有本机路径、命令或密钥类敏感内容；
+- 运行公开导出单元测试；
+- 只暂存公开网站白名单文件；
+- 提交并推送到 `main`，随后 GitHub Actions 自动刷新 `gh-pages`。
+
+只做本地校验不提交：
+
+```powershell
+scripts\update_public_dashboard_and_push.ps1 -ValidateOnly -SkipExport
+```
+
 ## 纯静态部署
 
 如果目标是“任何人打开链接都能访问”，优先使用纯静态入口：

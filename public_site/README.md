@@ -68,11 +68,12 @@ python -m http.server 8504 -d public_site
 
 ## GitHub Pages 自动发布
 
-仓库已提供 `.github/workflows/deploy-public-dashboard.yml`。启用步骤：
+仓库已提供 `.github/workflows/deploy-public-dashboard.yml`。该工作流会把 `public_site/` 中的静态站点发布到 `gh-pages` 分支。
 
 1. 把本项目推送到 GitHub 仓库。
 2. 在 GitHub 仓库页面打开 `Settings -> Pages`。
-3. `Build and deployment` 选择 `GitHub Actions`。
+3. `Build and deployment` 选择 `Deploy from a branch`。
+4. `Branch` 选择 `gh-pages`，目录选择 `/root`，点击 `Save`。
 4. 本地刷新公开快照并校验：
 
 ```powershell
@@ -82,7 +83,11 @@ scripts\validate_public_dashboard_static_site.ps1
 
 5. 提交并推送 `public_site/`、`.github/workflows/deploy-public-dashboard.yml` 和脚本变更。
 
-推送到 `main` 或 `master` 后，GitHub Actions 会发布 `public_site/`。发布完成后，GitHub Pages 页面会显示公网 URL。
+推送到 `main` 或 `master` 后，GitHub Actions 会自动刷新 `gh-pages` 分支。Pages 启用后，公网地址通常是：
+
+```text
+https://<your-user>.github.io/<your-repo>/
+```
 
 如果仓库没有绑定 GitHub 远程地址，先执行：
 

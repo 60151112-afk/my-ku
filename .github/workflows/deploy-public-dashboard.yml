@@ -1,4 +1,4 @@
-name: Deploy public dashboard
+name: Publish public dashboard branch
 
 on:
   push:
@@ -11,19 +11,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages-public-dashboard
+  group: public-dashboard-gh-pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,14 +31,25 @@ jobs:
           test -f public_site/.nojekyll
           python -c "from pathlib import Path; text='\\n'.join(p.read_text(encoding='utf-8', errors='replace') for p in Path('public_site').rglob('*') if p.is_file()); bad=['C:\\\\Users','AppData','python.exe','BEGIN PRIVATE KEY','api_key','secret_key','password=']; hits=[x for x in bad if x.lower() in text.lower()]; raise SystemExit('Sensitive markers found: '+', '.join(hits) if hits else 0)"
 
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - name: Prepare static site
+        run: |
+          rm -rf /tmp/public_dashboard_site
+          mkdir -p /tmp/public_dashboard_site/public_data
+          cp public_site/index.html /tmp/public_dashboard_site/index.html
+          cp public_site/.nojekyll /tmp/public_dashboard_site/.nojekyll
+          cp public_site/public_data/dashboard_public_latest.json /tmp/public_dashboard_site/public_data/dashboard_public_latest.json
+          cp public_site/public_data/dashboard_public_summary.csv /tmp/public_dashboard_site/public_data/dashboard_public_summary.csv
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: public_site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish gh-pages branch
+        run: |
+          cd /tmp/public_dashboard_site
+          git init
+          git checkout -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Deploy public dashboard"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

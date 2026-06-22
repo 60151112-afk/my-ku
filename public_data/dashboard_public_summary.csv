@@ -1,0 +1,9 @@
+﻿name,title,status,status_label,quote_date,row_count,load_status,load_error
+data_pipeline,数据链路诊断,warning,数据链路需复核,2026-06-16,8,ok,
+daily_review,每日复盘,blocked_review,只复盘不买入,2026-06-16,8,ok,
+cause_aggregation,阻断原因分布,strategy_issue,策略规则优先,,2,ok,
+loss_attribution,亏损归因,strategy_issue,先修策略,,5,ok,
+strategy_traffic_light,策略红绿灯,small_trial,,,5,ok,
+health_score,面板健康分,unknown,,,0,ok,
+next_actions,下一步动作,fresh,,2026-06-16,7,ok,
+next_trade_observation_review,观察计划复核,unknown,,2026-06-16,10,ok,

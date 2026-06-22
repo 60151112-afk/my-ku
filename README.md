@@ -1,0 +1,2 @@
+# my-ku
+Quantitative trading

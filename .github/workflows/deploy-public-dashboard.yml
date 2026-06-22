@@ -1,0 +1,49 @@
+name: Deploy public dashboard
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - public_site/**
+      - .github/workflows/deploy-public-dashboard.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-public-dashboard
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate public artifact
+        run: |
+          test -f public_site/index.html
+          test -f public_site/public_data/dashboard_public_latest.json
+          test -f public_site/.nojekyll
+          python -c "from pathlib import Path; text='\\n'.join(p.read_text(encoding='utf-8', errors='replace') for p in Path('public_site').rglob('*') if p.is_file()); bad=['C:\\\\Users','AppData','python.exe','BEGIN PRIVATE KEY','api_key','secret_key','password=']; hits=[x for x in bad if x.lower() in text.lower()]; raise SystemExit('Sensitive markers found: '+', '.join(hits) if hits else 0)"
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public_site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
